@@ -26,21 +26,30 @@ A full-stack options analytics dashboard for equity and ETF options — built wi
 - Axios for API calls
 
 ## Architecture
-frontend/ React + Vite app
-src/
-api/client.js Axios wrapper for the backend API
-components/ VolSurface, GreeksTable, TickerSearch, PortfolioBuilder
-App.jsx Main layout and data fetching
 
-backend/ FastAPI service
-main.py FastAPI app + CORS + lifespan
-routers/ surface, greeks, var, scenarios endpoints
-src/
-data.py Yahoo Finance fetching, caching, Black-Scholes pricing
-blackscholes.py Greeks and implied-vol inversion
-montecarlo.py Monte Carlo VaR
+```
+frontend/                    React + Vite app
+  src/
+    api/client.js            Axios wrapper for the backend API
+    components/
+      VolSurface.jsx         IV smile panels
+      GreeksTable.jsx        Options Greeks table
+      TickerSearch.jsx       Ticker input
+      PortfolioBuilder.jsx   Portfolio stress test UI
+    App.jsx                  Main layout and data fetching
 
-text
+backend/                     FastAPI service
+  main.py                    FastAPI app + CORS + lifespan
+  routers/
+    surface.py               Volatility surface endpoint
+    greeks.py                Greeks endpoint
+    var.py                   VaR endpoints
+    scenarios.py             Scenario endpoints
+  src/
+    data.py                  Yahoo Finance fetching, caching, Black-Scholes pricing
+    blackscholes.py          Greeks and implied-vol inversion
+    montecarlo.py            Monte Carlo VaR
+```
 
 ## Local Development
 
