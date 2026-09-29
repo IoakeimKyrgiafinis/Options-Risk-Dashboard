@@ -18,7 +18,11 @@ app = FastAPI(title="Options Risk Dashboard", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "options-risk-dashboard-five.vercel.app"],
+    allow_origins=[
+        "https://options-risk-dashboard-hx28ffgxq-ioakeim.vercel.app",  # production
+        "https://options-risk-dashboard-git-master-ioakeim.vercel.app",  # git branch previews
+        "http://localhost:5173",                                          # local dev
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
