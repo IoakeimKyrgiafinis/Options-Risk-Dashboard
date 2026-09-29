@@ -2,7 +2,7 @@
 
 A full-stack options analytics dashboard for equity and ETF options — built with React, FastAPI, and Yahoo Finance data.
 
-![Screenshot](docs/screenshot.png)
+
 
 ## Features
 
