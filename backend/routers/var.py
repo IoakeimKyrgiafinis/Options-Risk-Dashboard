@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List
 from src.montecarlo import compute_var, compute_options_var
-from state import model_state
+from state import model_state, update_model_state
 router = APIRouter()
 
 class OptionPosition(BaseModel):

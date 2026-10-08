@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 import pandas as pd
 from src.data import get_options_chain, get_spot_price, get_risk_free_rate
 from src.blackscholes import bs_greeks, bs_price
+from state import update_model_state  # <-- Προσθήκη import
 
 router = APIRouter()
 
@@ -14,6 +15,10 @@ def get_chain_greeks(
 ):
     try:
         symbol = ticker.upper()
+        
+        # Ενημέρωση του model state ώστε να συγχρονίζεται πλήρως
+        update_model_state(symbol)
+
         S = get_spot_price(symbol)
         r = get_risk_free_rate()
         sigma = 0.15

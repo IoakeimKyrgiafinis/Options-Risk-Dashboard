@@ -3,7 +3,7 @@ import { getVolSurface, getGreeks, getStatus } from './api/client'
 import VolSurface from './components/VolSurface'
 import GreeksTable from './components/GreeksTable'
 import PortfolioBuilder from './components/PortfolioBuilder'
-import TickerSearch from './components/TickerSearch'
+// import TickerSearch from './components/TickerSearch'
 
 export default function App() {
   const [ticker, setTicker] = useState('SPY')
@@ -61,19 +61,49 @@ export default function App() {
         <div style={{ textAlign: 'right' }}>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Last updated</p>
           <p style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-            {lastUpdated.toLocaleDateString('en-GB', {
-              day: 'numeric', month: 'short', year: 'numeric',
-              hour: '2-digit', minute: '2-digit',
-            })}
+            10/08/2026 16:55
           </p>
           <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.15rem' }}>
-            Source: Yahoo Finance · {ticker}
+            Source: Demo Snapshot · {ticker}
           </p>
         </div>
       </div>
 
-      {/* Ticker search — isolated component, does not re-render the charts */}
-      <TickerSearch onSearch={setTicker} loading={loading} initialValue={ticker} />
+      {/* Ticker Dropdown Selector */}
+      <div style={{ 
+        marginBottom: '1.5rem', 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '1rem',
+        background: 'var(--bg-secondary, #1e1e1e)',
+        padding: '1rem',
+        borderRadius: '8px',
+        border: '1px solid var(--border, #333)'
+      }}>
+        <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--text-primary, #fff)' }}>
+          Select Demo Ticker:
+        </label>
+        <select 
+          value={ticker} 
+          onChange={(e) => setTicker(e.target.value)}
+          style={{
+            background: '#2d2d2d',
+            border: '1px solid #444',
+            borderRadius: '6px',
+            padding: '0.5rem 1rem',
+            color: '#fff',
+            fontSize: '0.875rem',
+            outline: 'none',
+            cursor: 'pointer',
+            minWidth: '120px'
+          }}
+        >
+          {["SPY", "AAPL", "TSLA", "NVDA", "MSFT", "AMZN", "GOOGL", "META", "NFLX", "AMD"].map(t => (
+            <option key={t} value={t}>{t}</option>
+          ))}
+        </select>
+        {loading && <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Loading...</span>}
+      </div>
 
       {/* Error banner */}
       {error && (
