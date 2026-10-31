@@ -352,18 +352,8 @@ export default function PortfolioBuilder() {
                     {'  ·  Vol shock: '}
                     <span style={{ color: volColor, fontWeight: 600 }}>{volShock > 0 ? '+' : ''}{volShock}pp</span>
                   </p>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                    Spot: <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>${result.spot_base?.toFixed(2)}</span>
-                    {' → '}
-                    <span style={{ fontWeight: 600, color: result.spot_shocked < result.spot_base ? 'var(--red)' : 'var(--green)' }}>
-                      ${result.spot_shocked?.toFixed(2)}
-                    </span>
-                    {'  ·  Vol: '}
-                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{(result.vol_base * 100).toFixed(0)}%</span>
-                    {' → '}
-                    <span style={{ fontWeight: 600, color: result.vol_shocked > result.vol_base ? 'var(--red)' : 'var(--green)' }}>
-                      {(result.vol_shocked * 100).toFixed(0)}%
-                    </span>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                    Each position uses its own underlying's live spot and implied vol
                   </p>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -403,7 +393,7 @@ export default function PortfolioBuilder() {
                       <span style={{ color: 'var(--accent)', fontWeight: 600, marginRight: '0.35rem' }}>{p.ticker}</span>
                       {p.option_type} ${p.strike} ×{p.quantity}
                       <span style={{ fontSize: '0.7rem', marginLeft: '0.5rem', color: 'var(--text-secondary)' }}>
-                        δ {p.delta?.toFixed(3)} · ν {p.vega?.toFixed(3)}
+                        δ {p.delta?.toFixed(3)} · ν {p.vega?.toFixed(3)} · IV {(p.vol_base * 100).toFixed(0)}%
                       </span>
                     </span>
                     <span style={{ fontWeight: 600, color: p.pnl >= 0 ? 'var(--green)' : 'var(--red)' }}>
@@ -436,6 +426,19 @@ export default function PortfolioBuilder() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Underlying vols and correlations */}
+                  <p style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
+                    {varData.underlyings?.map(u => `${u.ticker} vol ${(u.vol * 100).toFixed(0)}%`).join(' · ')}
+                    {(() => {
+                      const t = varData.underlyings?.map(u => u.ticker) || []
+                      const pairs = []
+                      for (let i = 0; i < t.length; i++)
+                        for (let j = i + 1; j < t.length; j++)
+                          pairs.push(`${t[i]}–${t[j]} ${varData.correlation[t[i]][t[j]].toFixed(2)}`)
+                      return pairs.length ? `  ·  correlation ${pairs.join(', ')}` : ''
+                    })()}
+                  </p>
                 </div>
               )}
             </>

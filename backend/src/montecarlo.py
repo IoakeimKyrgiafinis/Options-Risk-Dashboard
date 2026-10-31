@@ -122,3 +122,68 @@ def compute_options_var(
         "horizon_days": horizon_days,
         "n_paths":    n_paths,
     }
+
+
+
+def compute_portfolio_var(positions, underlyings, tickers, corr, r,
+                          horizon_days=1, n_paths=10000, seed=42):
+    """
+    Monte Carlo VaR / ES for a multi-underlying options portfolio.
+
+    positions:   [{ticker, spot, strike, dte, option_type, quantity, iv}]
+    underlyings: {ticker: {"spot": S, "sigma": annualised vol}}
+    corr:        correlation matrix, ordered like `tickers`
+    """
+    n   = len(tickers)
+    rng = np.random.default_rng(seed)
+    dt  = horizon_days / 252   # vol is annualised on trading days
+    T_h = horizon_days / 365   # option time decay runs on calendar days
+
+    # Correlated standard normals
+    L = np.linalg.cholesky(corr + 1e-8 * np.eye(n))
+    Z = rng.standard_normal((n_paths, n)) @ L.T
+
+    S_final = {}
+    for i, t in enumerate(tickers):
+        S0  = underlyings[t]["spot"]
+        sig = underlyings[t]["sigma"]
+        S_final[t] = S0 * np.exp((r - 0.5 * sig ** 2) * dt + sig * np.sqrt(dt) * Z[:, i])
+
+    pnl = np.zeros(n_paths)
+    for p in positions:
+        K, iv, otype = p["strike"], p["iv"], p["option_type"]
+        T_opt = p["dte"] / 365
+        S_T   = S_final[p["ticker"]]
+
+        price_now = bs_price(p["spot"], K, T_opt, r, iv, otype)
+
+        if T_opt <= T_h:  # expires inside the horizon: intrinsic value
+            price_future = np.maximum(S_T - K, 0) if otype == "call" else np.maximum(K - S_T, 0)
+        else:
+            price_future = bs_price(S_T, K, T_opt - T_h, r, iv, otype)  # vectorised over paths
+
+        pnl += p["quantity"] * (price_future - price_now) * 100
+
+    var_95 = float(np.percentile(pnl, 5))
+    var_99 = float(np.percentile(pnl, 1))
+
+    return {
+        "var_95":       round(var_95, 2),
+        "var_99":       round(var_99, 2),
+        "es_95":        round(float(pnl[pnl <= var_95].mean()), 2),
+        "es_99":        round(float(pnl[pnl <= var_99].mean()), 2),
+        "pnl_mean":     round(float(pnl.mean()), 2),
+        "pnl_std":      round(float(pnl.std()), 2),
+        "pnl_dist":     [round(float(x), 2) for x in pnl[:500]],
+        "horizon_days": horizon_days,
+        "n_paths":      n_paths,
+        "underlyings": [
+            {"ticker": t, "spot": round(underlyings[t]["spot"], 2),
+             "vol": round(underlyings[t]["sigma"], 4)}
+            for t in tickers
+        ],
+        "correlation": {
+            tickers[i]: {tickers[j]: round(float(corr[i][j]), 3) for j in range(n)}
+            for i in range(n)
+        },
+    }

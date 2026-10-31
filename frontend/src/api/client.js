@@ -5,9 +5,8 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'
 const api = axios.create({ baseURL: BASE_URL })
 
 export const getVolSurface = (ticker = 'SPY') => api.get(`/api/surface/?ticker=${ticker}`)
-
-export const getGreeks = (optionType = 'call', ticker = 'SPY') =>
-  api.get(`/api/greeks/chain?option_type=${optionType}&ticker=${ticker}`)
+export const getGreeks     = (type = 'call', ticker = 'SPY') =>
+  api.get(`/api/greeks/chain?option_type=${type}&ticker=${ticker}`)
 
 export const getSpotVar = (days = 1) => api.get(`/api/var/spot?horizon_days=${days}`)
 export const getOptionsVar = (days = 1) => api.get(`/api/var/options?horizon_days=${days}`)
