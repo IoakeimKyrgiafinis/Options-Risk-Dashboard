@@ -16,7 +16,7 @@ A full-stack options analytics dashboard for equity and ETF options — built wi
 
 **Backend**
 - FastAPI (Python 3.11+)
-- yfinance for market data
+- alpaca for market data
 - scipy for Black-Scholes root-finding
 - NumPy / Pandas for data processing
 
@@ -46,7 +46,7 @@ backend/                     FastAPI service
     var.py                   VaR endpoints
     scenarios.py             Scenario endpoints
   src/
-    data.py                  Yahoo Finance fetching, caching, Black-Scholes pricing
+    data.py                  alpaca fetching, caching, Black-Scholes pricing
     blackscholes.py          Greeks and implied-vol inversion
     montecarlo.py            Monte Carlo VaR
 ```
@@ -78,7 +78,7 @@ Frontend: Vercel (static build)
 Environment variable VITE_API_URL on the frontend points to the Render backend URL.
 
 Data Source
-Yahoo Finance via yfinance. Note that Yahoo's impliedVolatility field is often a placeholder (returns 1e-5 for illiquid strikes), so the volatility surface is computed by inverting real market prices (bid/ask midpoint or last trade) through Black-Scholes.
+Alpaca API free tier.
 
 License
 MIT
